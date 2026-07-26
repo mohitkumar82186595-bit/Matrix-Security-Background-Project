@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Matrix Security Background V2</title>
+<style>
+    *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    overflow:hidden;
+    background:#020402;
+    font-family:'Orbitron',sans-serif;
+    color:#00ff88;
+}
+
+/* Matrix Canvas */
+
+#matrix{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:1;
+}
+
+/* Cyber Grid */
+
+.grid{
+    position:fixed;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+    background-image:
+    linear-gradient(rgba(0,255,120,.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,120,.08) 1px,transparent 1px);
+
+    background-size:40px 40px;
+
+    animation:gridMove 12s linear infinite;
+}
+
+@keyframes gridMove{
+
+    from{
+        transform:translateY(0);
+    }
+
+    to{
+        transform:translateY(40px);
+    }
+
+}
+
+/* Scanlines */
+
+.scanlines{
+
+    position:fixed;
+    inset:0;
+    z-index:3;
+    pointer-events:none;
+
+    background:
+    repeating-linear-gradient(
+        transparent 0px,
+        transparent 3px,
+        rgba(0,255,100,.04) 4px
+    );
+
+    animation:scan 8s linear infinite;
+}
+
+@keyframes scan{
+
+    from{
+        background-position:0 0;
+    }
+
+    to{
+        background-position:0 200px;
+    }
+
+}
+
+/* Glitch */
+
+.glitch{
+
+    position:fixed;
+    inset:0;
+    z-index:4;
+    pointer-events:none;
+
+    opacity:.08;
+
+    animation:glitch 4s infinite;
+
+    background:
+    linear-gradient(
+    rgba(255,0,0,.15),
+    transparent,
+    rgba(0,255,255,.15)
+    );
+
+}
+
+@keyframes glitch{
+
+0%,100%{
+transform:translate(0);
+}
+
+20%{
+transform:translate(2px,-2px);
+}
+
+40%{
+transform:translate(-3px,2px);
+}
+
+60%{
+transform:translate(4px,-1px);
+}
+
+80%{
+transform:translate(-2px,3px);
+}
+
+}
+
+/* Right Panel */
+
+.panel{
+
+position:absolute;
+
+top:50%;
+
+right:60px;
+
+transform:translateY(-50%);
+
+width:420px;
+
+padding:30px;
+
+border:1px solid rgba(0,255,120,.25);
+
+background:rgba(0,0,0,.45);
+
+backdrop-filter:blur(12px);
+
+border-radius:20px;
+
+z-index:20;
+
+box-shadow:
+
+0 0 25px rgba(0,255,120,.3),
+
+0 0 60px rgba(0,255,120,.08);
+
+}
+
+/* Heading */
+
+.panel h1{
+
+font-size:34px;
+
+letter-spacing:4px;
+
+text-shadow:
+
+0 0 15px #00ff88;
+
+margin-bottom:25px;
+
+}
+
+/* Online */
+
+.status{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+font-size:15px;
+
+margin-bottom:30px;
+
+}
+
+.dot{
+
+width:12px;
+
+height:12px;
+
+border-radius:50%;
+
+background:#00ff55;
+
+box-shadow:
+
+0 0 10px #00ff55,
+
+0 0 25px #00ff55;
+
+animation:pulse 1s infinite;
+
+}
+
+@keyframes pulse{
+
+50%{
+
+transform:scale(1.5);
+
+}
+
+}
+
+/* Terminal */
+
+.terminal{
+
+height:140px;
+
+overflow:hidden;
+
+padding:15px;
+
+border:1px solid rgba(0,255,100,.2);
+
+background:#010101;
+
+border-radius:10px;
+
+font-family:monospace;
+
+color:#00ff66;
+
+line-height:1.6;
+
+box-shadow:inset 0 0 15px rgba(0,255,100,.15);
+
+margin-bottom:25px;
+
+}
+
+/* Stats */
+
+.stats{
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:15px;
+
+}
+
+.card{
+
+padding:18px;
+
+text-align:center;
+
+background:rgba(0,255,120,.05);
+
+border:1px solid rgba(0,255,120,.15);
+
+border-radius:12px;
+
+transition:.35s;
+
+}
+
+.card:hover{
+
+transform:translateY(-6px);
+
+box-shadow:0 0 20px rgba(0,255,120,.25);
+
+}
+
+.card h3{
+
+font-size:14px;
+
+margin-bottom:10px;
+
+color:#6dffb8;
+
+}
+
+.card span{
+
+font-size:20px;
+
+font-weight:bold;
+
+text-shadow:0 0 12px #00ff88;
+
+}
+
+/* Radar */
+
+.radar{
+
+position:absolute;
+
+left:70px;
+
+top:50%;
+
+transform:translateY(-50%);
+
+width:260px;
+
+height:260px;
+
+border-radius:50%;
+
+border:2px solid rgba(0,255,120,.2);
+
+overflow:hidden;
+
+z-index:15;
+
+}
+
+.circle{
+
+position:absolute;
+
+border:1px solid rgba(0,255,120,.2);
+
+border-radius:50%;
+
+}
+
+.c1{
+
+width:80px;
+
+height:80px;
+
+left:90px;
+
+top:90px;
+
+}
+
+.c2{
+
+width:160px;
+
+height:160px;
+
+left:50px;
+
+top:50px;
+
+}
+
+.c3{
+
+width:240px;
+
+height:240px;
+
+left:10px;
+
+top:10px;
+
+}
+
+.line{
+
+position:absolute;
+
+left:50%;
+
+top:50%;
+
+width:2px;
+
+height:50%;
+
+background:#00ff88;
+
+transform-origin:bottom;
+
+animation:radar 3s linear infinite;
+
+box-shadow:0 0 20px #00ff88;
+
+}
+
+@keyframes radar{
+
+from{
+
+transform:rotate(0deg);
+
+}
+
+to{
+
+transform:rotate(360deg);
+
+}
+
+}
+
+/* Binary Particles */
+
+#particles{
+
+position:fixed;
+
+inset:0;
+
+pointer-events:none;
+
+z-index:5;
+
+}
+
+.binary{
+
+position:absolute;
+
+font-size:12px;
+
+font-family:monospace;
+
+color:#00ff66;
+
+opacity:.25;
+
+animation:float linear forwards;
+
+}
+
+@keyframes float{
+
+from{
+
+transform:translateY(100vh);
+
+opacity:0;
+
+}
+
+20%{
+
+opacity:.35;
+
+}
+
+100%{
+
+transform:translateY(-120px);
+
+opacity:0;
+
+}
+
+}
+
+/* Responsive */
+
+@media(max-width:1000px){
+
+.panel{
+
+right:20px;
+
+width:340px;
+
+}
+
+.radar{
+
+display:none;
+
+}
+
+}
+
+@media(max-width:700px){
+
+.panel{
+
+left:50%;
+
+top:50%;
+
+transform:translate(-50%,-50%);
+
+width:92%;
+
+}
+
+.stats{
+
+grid-template-columns:1fr;
+
+}
+
+}
+</style>
+<!-- Orbitron Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<!-- Matrix Rain -->
+<canvas id="matrix"></canvas>
+
+<!-- Cyber Grid -->
+<div class="grid"></div>
+
+<!-- Scan Lines -->
+<div class="scanlines"></div>
+
+<!-- Glitch Overlay -->
+<div class="glitch"></div>
+
+<!-- Radar -->
+<div class="radar">
+    <div class="circle c1"></div>
+    <div class="circle c2"></div>
+    <div class="circle c3"></div>
+    <div class="line"></div>
+</div>
+
+<!-- Security Panel -->
+<div class="panel">
+
+<h1>CYBER SECURITY</h1>
+
+<div class="status">
+<span class="dot"></span>
+SYSTEM ONLINE
+</div>
+
+<div class="terminal">
+<p id="typing"></p>
+</div>
+
+<div class="stats">
+
+<div class="card">
+<h3>CPU</h3>
+<span id="cpu">0%</span>
+</div>
+
+<div class="card">
+<h3>RAM</h3>
+<span id="ram">0%</span>
+</div>
+
+<div class="card">
+<h3>NETWORK</h3>
+<span id="net">0 MB/s</span>
+</div>
+
+</div>
+
+</div>
+
+<!-- Binary Particles -->
+<div id="particles"></div>
+
+<script>
+    const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+// Matrix Characters
+const chars =
+"アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@";
+
+const letters = chars.split("");
+
+const fontSize = 18;
+let columns = Math.floor(canvas.width / fontSize);
+let drops = Array(columns).fill(1);
+
+// Draw Matrix Rain
+function drawMatrix(){
+
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.font = fontSize + "px monospace";
+
+    for(let i=0;i<drops.length;i++){
+
+        const text =
+        letters[Math.floor(Math.random()*letters.length)];
+
+        const x = i * fontSize;
+        const y = drops[i] * fontSize;
+
+        // Bright Head Character
+        ctx.fillStyle="#b8ffcf";
+        ctx.shadowColor="#00ff88";
+        ctx.shadowBlur=20;
+        ctx.fillText(text,x,y);
+
+        // Trail
+        ctx.fillStyle="#00ff66";
+        ctx.shadowBlur=8;
+        ctx.fillText(
+            letters[Math.floor(Math.random()*letters.length)],
+            x,
+            y-fontSize
+        );
+
+        if(y>canvas.height && Math.random()>0.975){
+            drops[i]=0;
+        }
+
+        drops[i]++;
+
+    }
+
+}
+
+setInterval(drawMatrix,33);
+
+// Resize
+window.addEventListener("resize",()=>{
+
+    canvas.width=innerWidth;
+    canvas.height=innerHeight;
+
+    columns=Math.floor(canvas.width/fontSize);
+    drops=Array(columns).fill(1);
+
+});
+
+
+// ============================
+// Hacker Typing Animation
+// ============================
+
+const terminal=document.getElementById("typing");
+
+const commands=[
+
+"> Initializing Secure Kernel...",
+"> Loading Firewall...",
+"> Encrypting Files...",
+"> Connecting Server...",
+"> Scanning Network...",
+"> Intrusion Detection Enabled...",
+"> Authentication Success...",
+"> Monitoring Traffic...",
+"> AI Defender Activated...",
+"> Access Level : ADMIN"
+
+];
+
+let line=0;
+
+function typeCommand(){
+
+    if(line>=commands.length){
+
+        terminal.innerHTML="";
+        line=0;
+
+    }
+
+    let text=commands[line];
+    let i=0;
+
+    const typing=setInterval(()=>{
+
+        terminal.innerHTML+=text.charAt(i);
+
+        i++;
+
+        if(i>=text.length){
+
+            clearInterval(typing);
+
+            terminal.innerHTML+="<br>";
+
+            line++;
+
+            setTimeout(typeCommand,500);
+
+        }
+
+    },35);
+
+}
+
+typeCommand();
+
+
+// ============================
+// Live System Stats
+// ============================
+
+const cpu=document.getElementById("cpu");
+const ram=document.getElementById("ram");
+const net=document.getElementById("net");
+
+function updateStats(){
+
+    cpu.innerText=
+    Math.floor(Math.random()*45+40)+"%";
+
+    ram.innerText=
+    Math.floor(Math.random()*35+45)+"%";
+
+    net.innerText=
+    (Math.random()*120).toFixed(1)+" MB/s";
+
+}
+
+setInterval(updateStats,1000);
+
+updateStats();
+// ===============================
+// Floating Binary Particles
+// ===============================
+
+const particleBox = document.getElementById("particles");
+
+function createParticle(){
+
+    const p = document.createElement("div");
+
+    p.className = "binary";
+
+    p.innerText = Math.random() > 0.5 ? "1" : "0";
+
+    p.style.left = Math.random() * window.innerWidth + "px";
+
+    p.style.animationDuration =
+        (5 + Math.random() * 8) + "s";
+
+    p.style.fontSize =
+        (10 + Math.random() * 12) + "px";
+
+    particleBox.appendChild(p);
+
+    setTimeout(()=>{
+        p.remove();
+    },13000);
+
+}
+
+setInterval(createParticle,120);
+
+
+// ===============================
+// Mouse Interaction
+// ===============================
+
+let mouseX = -1000;
+let mouseY = -1000;
+
+window.addEventListener("mousemove",(e)=>{
+
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+});
+
+function drawMatrix(){
+
+    ctx.fillStyle="rgba(0,0,0,.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.font=fontSize+"px monospace";
+
+    for(let i=0;i<drops.length;i++){
+
+        const x=i*fontSize;
+        const y=drops[i]*fontSize;
+
+        const char =
+        letters[Math.floor(Math.random()*letters.length)];
+
+        const dx=x-mouseX;
+        const dy=y-mouseY;
+
+        const dist=Math.sqrt(dx*dx+dy*dy);
+
+        if(dist<120){
+
+            ctx.fillStyle="#ffffff";
+            ctx.shadowColor="#ffffff";
+            ctx.shadowBlur=35;
+
+        }else{
+
+            ctx.fillStyle="#00ff66";
+            ctx.shadowColor="#00ff66";
+            ctx.shadowBlur=12;
+
+        }
+
+        ctx.fillText(char,x,y);
+
+        if(y>canvas.height && Math.random()>0.98){
+
+            drops[i]=0;
+
+        }
+
+        drops[i]++;
+
+    }
+
+}
+
+clearInterval();
+setInterval(drawMatrix,33);
+
+
+// ===============================
+// Random Security Alerts
+// ===============================
+
+const alerts=[
+
+"ACCESS GRANTED",
+"FIREWALL ACTIVE",
+"NETWORK SECURE",
+"AI DEFENDER ONLINE",
+"THREAT BLOCKED",
+"INTRUSION DETECTED",
+"SCANNING PORTS...",
+"VERIFYING USER...",
+"PACKETS ENCRYPTED"
+
+];
+
+function securityAlert(){
+
+    const box=document.createElement("div");
+
+    box.innerHTML=
+    alerts[Math.floor(Math.random()*alerts.length)];
+
+    box.style.position="fixed";
+    box.style.top="40px";
+    box.style.left="50%";
+    box.style.transform="translateX(-50%)";
+
+    box.style.padding="15px 35px";
+
+    box.style.background="rgba(0,0,0,.75)";
+
+    box.style.border="1px solid #00ff66";
+
+    box.style.color="#00ff66";
+
+    box.style.fontFamily="Orbitron";
+
+    box.style.fontSize="18px";
+
+    box.style.letterSpacing="3px";
+
+    box.style.boxShadow="0 0 25px #00ff66";
+
+    box.style.zIndex="999";
+
+    document.body.appendChild(box);
+
+    setTimeout(()=>{
+
+        box.remove();
+
+    },2500);
+
+}
+
+setInterval(securityAlert,7000);
+
+
+// ===============================
+// Random Screen Glitch
+// ===============================
+
+const glitch=document.querySelector(".glitch");
+
+setInterval(()=>{
+
+    glitch.style.opacity=.25;
+
+    glitch.style.transform=
+    `translate(${Math.random()*8-4}px,
+               ${Math.random()*8-4}px)`;
+
+    setTimeout(()=>{
+
+        glitch.style.opacity=.08;
+        glitch.style.transform="translate(0,0)";
+
+    },120);
+
+},3000);
+
+
+// ===============================
+// Background Flash
+// ===============================
+
+setInterval(()=>{
+
+    document.body.style.filter="brightness(1.2)";
+
+    setTimeout(()=>{
+
+        document.body.style.filter="brightness(1)";
+
+    },80);
+
+},9000);
+
+
+// ===============================
+// Random Radar Pulse
+// ===============================
+
+const radar=document.querySelector(".radar");
+
+setInterval(()=>{
+
+    radar.style.boxShadow=
+    "0 0 50px #00ff66";
+
+    setTimeout(()=>{
+
+        radar.style.boxShadow="none";
+
+    },500);
+
+},4000);
+
+
+// ===============================
+// Smooth Animation Loop
+// ===============================
+
+function animate(){
+
+    requestAnimationFrame(animate);
+
+}
+
+animate();
+</script>
+
+</body>
+</html>
